@@ -10,10 +10,24 @@ import {
   CardContent,
 } from "@material-ui/core";
 import "./Components/Styles/style.css";
+import Table from "./Components/Table";
+import {SortData} from "./Components/sort"
+import Chart from "./Components/Chart";
+// import LineGraph from "./Components/LineGraph";
+
 function App() {
-  const [countries, setCountries] = useState(["USA", "UK", "India"]);
+  const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState("worldwide");
   const [countryInfo, setCountryInfo] = useState({});
+  const [tableData, setTableData] = useState([]);
+
+  useEffect(() => {
+    fetch("https://disease.sh/v3/covid-19/all")
+      .then((response) => response.json())
+      .then((data) => {
+        setCountryInfo(data);
+      });
+  }, []);
 
   useEffect(() => {
     const getCountriesData = async () => {
@@ -24,7 +38,12 @@ function App() {
             name: country.country,
             value: country.countryInfo.iso2,
           }));
-          setCountries(countries);
+
+          const sortdata = SortData(data);
+          setCountries(countries);   
+          setTableData(sortdata);
+       
+          
         });
     };
 
@@ -34,9 +53,9 @@ function App() {
   const onCountryChange = async (event) => {
     const countryCode = event.target.value;
 
-    console.log("countryCode", countryCode);
+    // console.log("countryCode", countryCode);
 
-    setCountry(countryCode);
+     setCountry(countryCode);
 
     const url =
       countryCode === "worldwide"
@@ -48,10 +67,9 @@ function App() {
       .then((data) => {
         setCountry(data);
         setCountryInfo(data);
-
       });
 
-      console.log('countryInfo',countryInfo);
+    console.log("countryInfo", countryInfo);
   };
 
   return (
@@ -78,9 +96,21 @@ function App() {
           </FormControl>
         </div>
         <div className="app_stats">
-          <Info title="CoronaVirus" total={10000} cases={123} />
-          <Info title="Recovered cases" total={9500} cases={1234} />
-          <Info title="Deaths" total={500} cases={12345} />
+          <Info
+            title="CoronaVirus"
+            total={countryInfo.cases}
+            cases={countryInfo.todayCases}
+          />
+          <Info
+            title="Recovered cases"
+            total={countryInfo.recovered}
+            cases={countryInfo.todayRecovered}
+          />
+          <Info
+            title="Deaths"
+            total={countryInfo.deaths}
+            cases={countryInfo.todayDeaths}
+          />
         </div>
 
         <div>
@@ -89,7 +119,10 @@ function App() {
       </div>
       <Card className="right">
         <h3> Live Cases </h3>
+        <Table countries={tableData} />
         <h3> World Wide Cases </h3>
+        <Chart />
+        {/* <LineGraph/> */}
       </Card>
     </div>
   );

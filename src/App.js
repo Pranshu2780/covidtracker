@@ -11,16 +11,20 @@ import {
 } from "@material-ui/core";
 import "./Components/Styles/style.css";
 import Table from "./Components/Table";
-import {SortData} from "./Components/sort"
+import { SortData } from "./Components/sort";
 import Chart from "./Components/Chart";
-// import LineGraph from "./Components/LineGraph";
+import LineGraph from "./Components/LineGraph";
+import "leaflet/dist/leaflet.css";
 
 function App() {
   const [countries, setCountries] = useState([]);
   const [country, setCountry] = useState("worldwide");
+  const [casesType, setCasesType] = useState("cases");
   const [countryInfo, setCountryInfo] = useState({});
   const [tableData, setTableData] = useState([]);
-
+  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
+  const [mapZoom, setMapZoom] = useState(3);
+  const [mapCountries, setMapCountries] = useState([]);
   useEffect(() => {
     fetch("https://disease.sh/v3/covid-19/all")
       .then((response) => response.json())
@@ -40,22 +44,21 @@ function App() {
           }));
 
           const sortdata = SortData(data);
-          setCountries(countries);   
+          setCountries(countries);
+          setMapCountries(data);
           setTableData(sortdata);
-       
-          
         });
     };
 
     getCountriesData();
-  }, [countries]);
+  }, []);
 
   const onCountryChange = async (event) => {
     const countryCode = event.target.value;
 
     // console.log("countryCode", countryCode);
 
-     setCountry(countryCode);
+    //  setCountry(countryCode);
 
     const url =
       countryCode === "worldwide"
@@ -65,11 +68,11 @@ function App() {
     await fetch(url)
       .then((response) => response.json())
       .then((data) => {
-        setCountry(data);
+        setCountry(countryCode);
         setCountryInfo(data);
+        setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
+        setMapZoom(4);
       });
-
-    console.log("countryInfo", countryInfo);
   };
 
   return (
@@ -114,15 +117,18 @@ function App() {
         </div>
 
         <div>
-          <Map />
+          <Map  countries={mapCountries}
+          casesType={casesType}
+          center={mapCenter}
+          zoom={mapZoom} />
         </div>
       </div>
       <Card className="right">
         <h3> Live Cases </h3>
         <Table countries={tableData} />
-        <h3> World Wide Cases </h3>
-        <Chart />
-        {/* <LineGraph/> */}
+        <h3> World Wide Cases {casesType} </h3>
+        {/* <Chart /> */}
+        <LineGraph  />
       </Card>
     </div>
   );

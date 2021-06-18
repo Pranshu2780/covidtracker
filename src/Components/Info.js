@@ -4,7 +4,7 @@ import "./Styles/Info.css"
 function Info({ title, cases, total }) {
   return (
     <Card className="infoBox">
-      <CardContent>
+      <CardContent style={{Color:"#FA94C4"}} >
 
         <Typography className="infoBox_title" color="textSecondary">
           {title}

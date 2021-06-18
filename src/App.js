@@ -22,7 +22,7 @@ function App() {
   const [casesType, setCasesType] = useState("cases");
   const [countryInfo, setCountryInfo] = useState({});
   const [tableData, setTableData] = useState([]);
-  const [mapCenter, setMapCenter] = useState({ lat: 34.80746, lng: -40.4796 });
+  const [mapCenter, setMapCenter] = useState({ lat: 20.5937, lng:  78.9629 });
   const [mapZoom, setMapZoom] = useState(3);
   const [mapCountries, setMapCountries] = useState([]);
   useEffect(() => {
@@ -35,7 +35,7 @@ function App() {
 
   useEffect(() => {
     const getCountriesData = async () => {
-      await fetch("https://disease.sh/v3/covid-19/countries")
+       fetch("https://disease.sh/v3/covid-19/countries")
         .then((response) => response.json())
         .then((data) => {
           const countries = data.map((country) => ({
@@ -71,7 +71,7 @@ function App() {
         setCountry(countryCode);
         setCountryInfo(data);
         setMapCenter([data.countryInfo.lat, data.countryInfo.long]);
-        setMapZoom(4);
+        setMapZoom(7);
       });
   };
 
@@ -126,9 +126,9 @@ function App() {
       <Card className="right">
         <h3> Live Cases </h3>
         <Table countries={tableData} />
-        <h3> World Wide Cases {casesType} </h3>
+        <h3> World Wide Cases </h3>
         {/* <Chart /> */}
-        <LineGraph  />
+        <LineGraph casesType={casesType}  />
       </Card>
     </div>
   );
